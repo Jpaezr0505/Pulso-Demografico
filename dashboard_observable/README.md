@@ -1,4 +1,4 @@
-# Demografía Colombia
+# Pulso Demográfico
 
 This is an [Observable Framework](https://observablehq.com/framework/) app. To install the required dependencies, run:
 

@@ -1,0 +1,2 @@
+Respaldo del diseño y textos del tablero (17-nov-2026).
+Para volver: copiar src/* y observablehq.config.js de esta carpeta sobre dashboard_observable/.

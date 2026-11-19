@@ -38,8 +38,8 @@ No reemplaza al DANE: lo complementa mostrando cuánta incertidumbre tiene su pr
 1. **Limpieza** (`main.R`): se ordenaron todas las bases en tablas simples y se verificaron con controles automáticos (todo cuadra con los totales oficiales).
 2. **Comparación con la realidad:** se calculó la fecundidad con los nacimientos EEVV y se contrastó con la del DANE.
 3. **Proyector propio** (`modelo.R`): reproduce la proyección del DANE (pico 2043, error máximo 0,5 %). Con él se pueden cambiar los supuestos y ver qué pasa.
-4. **Escenarios, Monte Carlo y sensibilidad:** se probó qué pasa con otras fecundidades, y se corrieron 1.000 futuros posibles con incertidumbre en fecundidad, mortalidad y migración.
-5. **Mapa** (`mapa.R`): nacimientos por departamento listos para graficar.
+4. **Escenarios, Monte Carlo y sensibilidad:** se probó qué pasa con otras fecundidades, y se corrieron 100.000 futuros posibles con incertidumbre en fecundidad, mortalidad y migración.
+5. **Departamentos y mapa** (`departamentos.R`, `mapa.R`): año del máximo, TGF y nacimientos por departamento, picos de 22 regiones y los GeoJSON del mapa (página Territorio).
 
 ## 5. Resultados (lo que el tablero debe mostrar)
 
@@ -60,8 +60,8 @@ No reemplaza al DANE: lo complementa mostrando cuánta incertidumbre tiene su pr
 | Fecundidad se queda en nivel EEVV (1,03) | **2035** | 52,5 M |
 | Recuperación parcial (1,5 en 2050) | 2043 | 53,3 M |
 
-**c) Probabilidad del año del pico (1.000 simulaciones)**
-- **Antes de 2043: 76,6 %** · En 2043: 8,3 % · Después: 15,1 %
+**c) Probabilidad del año del pico (100.000 simulaciones)**
+- **Antes de 2043: 76,6 %** · En 2043: 8,4 % · Después: 15,0 %
 - Mediana: **2040** · Rango 90 %: **2036 a 2045**
 
 **d) Qué componente pesa más (cuánto mueve el año del pico)**
@@ -81,7 +81,8 @@ Todas en CSV, columnas sin tildes. `sexo` = hombres/mujeres; `edad` = 0-100 (100
 - `mortalidad_limpia`, `tablas_vida_limpia` — mortalidad y supervivencia.
 - `migracion_limpia` — saldo migratorio. *Usar `tipo == "internacional"`.*
 - `eevv_nacional` / `eevv_departamental` — nacimientos reales por edad de la madre / por departamento (`cod_dpto` de 2 dígitos como texto, "05").
-- `mapa_departamentos.geojson` — polígonos + nacimientos 2018-2025, variación y participación.
+- `mapa_departamentos.geojson` — polígonos de los 33 departamentos (`cod_dpto`, `nombre`); las métricas están en `resultados/departamentos_metricas.csv`.
+- `mapa_san_andres.geojson` — San Andrés, Providencia y Santa Catalina (geoBoundaries) para el recuadro ampliado.
 
 **`resultados/`** (lo que más usa el tablero)
 
@@ -124,11 +125,11 @@ Todas en CSV, columnas sin tildes. `sexo` = hombres/mujeres; `edad` = 0-100 (100
 - Es fecundidad **"calculada con EEVV"**, no "observada": incluye hijos de madres residentes en el exterior y la población del denominador es una proyección. Es una señal fuerte, no una medida exacta.
 - Las probabilidades dependen de **supuestos del equipo** (TGF entre 1,0 y 1,8; mortalidad ±5 %; migración ±50 %). Decir "según los supuestos del modelo".
 - El modelo da 56,30 M en 2043 y el DANE 56,05 M (+0,45 %): comparar escenarios contra la curva "DANE" del modelo, y mostrar la oficial como referencia.
-- Solo nivel nacional. El mapa es por departamento y solo muestra nacimientos (las 22 regiones del DANE no se pueden mapear: se arman con municipios y la tabla no es pública).
+- Los escenarios, Monte Carlo y sensibilidad son solo nacionales. El mapa es por departamento (año del máximo según la proyección DANE por departamento, TGF y nacimientos EEVV); las 22 regiones se muestran en un gráfico, no en el mapa (se arman con municipios y la tabla no es pública).
 
 ## 9. Pendientes
 
-- Correr `mapa.R` con el MGN 2025 en `datos_crudos/mapa/` (hasta entonces no existe `mapa_departamentos.geojson`).
+- Sustituir el MGN 2018 por el MGN 2025 en `datos_crudos/mapa/` y volver a correr `mapa.R`.
 - Pedir al DANE la tabla municipio → región (para mapear las 22 regiones).
 - Revisar y justificar los rangos de incertidumbre.
 - Informe técnico.
@@ -138,7 +139,7 @@ Todas en CSV, columnas sin tildes. `sexo` = hombres/mujeres; `edad` = 0-100 (100
 - Lee solo los archivos de la sección 6; no recalcules ni inventes datos.
 - Usa los nombres de columna tal cual. `cod_dpto` es texto de 2 caracteres.
 - Filtra `area == "total"` en población y `tipo == "internacional"` en migración.
-- Usa las probabilidades exactas (76,6 %, 8,3 %, 15,1 %) y muestra siempre las advertencias de la sección 8.
+- Usa las probabilidades exactas (76,6 %, 8,4 %, 15,0 %) y muestra siempre las advertencias de la sección 8.
 - Si falta un archivo, indica qué script lo genera (`main.R`, `modelo.R` o `mapa.R`).
 
 **Fuentes:** DANE — Proyecciones de población 2018-2070 (jul-2025), Estimaciones del cambio demográfico, Estadísticas Vitales (nacimientos 2018-2025), Marco Geoestadístico Nacional 2025.

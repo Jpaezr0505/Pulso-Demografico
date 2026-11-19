@@ -1,0 +1,9 @@
+# Configuración de Netlify: compila el tablero Observable Framework.
+[build]
+  base    = "dashboard_observable"
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  OBSERVABLE_TELEMETRY_DISABLE = "true"

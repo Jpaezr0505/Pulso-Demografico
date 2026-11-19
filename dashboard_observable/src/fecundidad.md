@@ -7,7 +7,7 @@ toc: false
 
 ## ¿Se cumple lo proyectado?
 
-La TGF calculada con nacimientos EEVV disminuye más rápido que la proyección del DANE. Es una estimación indirecta, no una medición poblacional directa.
+La tasa global de fecundidad (TGF) es el promedio de hijos por mujer. Calculada con los nacimientos registrados en las Estadísticas Vitales (EEVV), cae mucho más rápido que la proyección del DANE: 1,03 frente a 1,65 en 2025.
 
 ```js
 import * as Plot from "npm:@observablehq/plot";
@@ -40,7 +40,7 @@ const tasasValidas = fecundidadFuente.filter(d =>
 );
 const detalleValido = tasasValidas;
 if (!detalleValido.length) throw new Error("No hay tasas válidas por grupo de edad.");
-const maxTasaDetalle = Math.ceil(Math.max(...detalleValido.flatMap(d => [d.tasa_eevv, d.tasa_dane])) * 4) / 4;
+const maxTasaDetalle = Math.ceil(Math.max(...detalleValido.flatMap(d => [d.tasa_eevv, d.tasa_dane])) * 50) / 50;
 const formatoTasaDetalle = new Intl.NumberFormat("es-CO", {minimumFractionDigits: 5, maximumFractionDigits: 5});
 ```
 
@@ -56,24 +56,25 @@ const formatoTasaDetalle = new Intl.NumberFormat("es-CO", {minimumFractionDigits
 <section class="editorial-section" aria-labelledby="tgf-tiempo">
   <p class="section-kicker">TENDENCIA NACIONAL</p>
   <h2 id="tgf-tiempo">La TGF calculada con EEVV se separa de la proyección del DANE</h2>
-  <p>La serie compara la TGF derivada de nacimientos EEVV con la proyección del DANE. La referencia de 2,1 hijos por mujer indica el nivel convencional de reemplazo.</p>
+  <p>La brecha entre ambas series crece de 0,2 hijos por mujer en 2018 a 0,6 en 2025. La línea de 2,1 es el nivel de reemplazo.</p>
 </section>
 
 ```js
 Plot.plot({
   width,
   height: 380,
-  marginLeft: 70,
+  marginLeft: width < 600 ? 44 : 70,
   marginBottom: 48,
   color: {
     domain: ["EEVV · calculada", "DANE · proyectada"],
     range: ["#176B73", "#687789"],
     legend: true
   },
-  x: {label: "Año", ticks: 8, tickFormat: d => String(Math.round(d))},
-  y: {label: "Hijos por mujer", grid: true, domain: [0, 2.2]},
+  x: {label: "Año", ticks: width < 600 ? 4 : 8, tickFormat: d => String(Math.round(d))},
+  y: {label: "Hijos por mujer", grid: true, domain: [0, 2.2], tickFormat: d => d.toLocaleString("es-CO", {minimumFractionDigits: 1, maximumFractionDigits: 1})},
   marks: [
     Plot.ruleY([2.1], {stroke: "#C79B45", strokeDasharray: "4,4", strokeWidth: 1.5}),
+    Plot.text([{anio: 2018, valor: 2.1}], {x: "anio", y: "valor", text: () => "Nivel de reemplazo (2,1)", dy: -8, textAnchor: "start", fill: "#6B6F6F", fontSize: 12}),
     Plot.line(tgfSeries, {x: "anio", y: "valor", stroke: "fuente", z: "fuente", strokeWidth: 2.5}),
     Plot.dot(serieTgfEevv, Plot.pointer({
       x: "anio",
@@ -112,17 +113,18 @@ Plot.plot({
 <section class="editorial-section" aria-labelledby="relacion-fuentes">
   <p class="section-kicker">COMPARACIÓN POR GRUPO DE EDAD</p>
   <h2 id="relacion-fuentes">Relación entre las tasas por grupo de edad</h2>
-  <p>Cada punto corresponde a un año y grupo de edad. La diagonal indica igualdad; los puntos inferiores representan tasas EEVV menores que las proyectadas por el DANE.</p>
+  <p>Cada punto es un año y un grupo de edad de la madre. Bajo la diagonal, los nacimientos registrados son menores que los proyectados.</p>
 </section>
 
 ```js
 Plot.plot({
   width,
   height: 400,
-  marginLeft: 70,
+  marginLeft: width < 600 ? 50 : 70,
   marginBottom: 54,
-  x: {label: "Tasa DANE proyectada", domain: [0, 0.12], grid: true},
-  y: {label: "Tasa calculada con EEVV", domain: [0, 0.12]},
+  color: {legend: true, label: "Grupo de edad de la madre", domain: [...new Set(detalleValido.map(d => d.grupo))].sort(), range: ["#687789", "#C79B45", "#C8795B", "#05AD98", "#045F54", "#75AEB1", "#8A4A32", "#EBB3A0"]},
+  x: {label: "Tasa DANE proyectada", domain: [0, maxTasaDetalle], grid: true, tickFormat: d => d.toLocaleString("es-CO", {minimumFractionDigits: 2, maximumFractionDigits: 2})},
+  y: {label: "Tasa calculada con EEVV", domain: [0, maxTasaDetalle], grid: true, tickFormat: d => d.toLocaleString("es-CO", {minimumFractionDigits: 2, maximumFractionDigits: 2})},
   marks: [
     Plot.line([{tasa: 0}, {tasa: maxTasaDetalle}], {x: "tasa", y: "tasa", stroke: "#A8B2BE", strokeDasharray: "4,4"}),
     Plot.dot(detalleValido, {
@@ -138,4 +140,4 @@ Plot.plot({
 })
 ```
 
-<div class="method-note"><strong>Limitación:</strong> la TGF EEVV es una estimación calculada, no una observación directa. Incluye nacimientos de madres residentes en el exterior y usa población proyectada como denominador; no es directamente equivalente a la proyección del DANE.</div>
+<div class="method-note"><strong>Limitación:</strong> la TGF EEVV es calculada, no observada: incluye nacimientos de madres residentes en el exterior, usa población proyectada como denominador y los años recientes pueden cambiar por registros tardíos.</div>

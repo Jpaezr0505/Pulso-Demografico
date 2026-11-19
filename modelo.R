@@ -43,7 +43,8 @@ param <- list(
   anio_tgf_meta    = 2050,
 
   # Incertidumbre del Monte Carlo
-  n_sim         = 5000,
+  n_sim         = 100000,   # trayectorias del Monte Carlo (100.000 tarda varios minutos)
+  n_detalle     = 5000,     # cuántas simulaciones se guardan una por una en montecarlo_pico.csv
   tgf_min       = 1.00,    # TGF de largo plazo ~ triangular(min, moda, max)
   tgf_moda      = 1.30,
   tgf_max       = 1.80,
@@ -220,7 +221,10 @@ mc_bandas <- tibble(anio = anios,
                     p95 = apply(mat_sim, 2, quantile, 0.95),
                     dane = total_dane)
 
-write_csv(mc_pico,    "resultados/montecarlo_pico.csv")
+# Con muchas simulaciones el detalle completo pesa decenas de MB: el tablero usa el conteo por año
+mc_conteo <- mc_pico %>% count(anio_pico, name = "simulaciones")
+write_csv(mc_conteo,  "resultados/montecarlo_conteo_pico.csv")
+write_csv(head(mc_pico, param$n_detalle), "resultados/montecarlo_pico.csv")   # muestra de ejemplo
 write_csv(mc_resumen, "resultados/montecarlo_resumen.csv")
 write_csv(mc_bandas,  "resultados/montecarlo_bandas.csv")
 cat("\n== Monte Carlo (", param$n_sim, " trayectorias) ==\n", sep = ""); print(t(mc_resumen))

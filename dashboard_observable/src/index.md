@@ -2,11 +2,10 @@
 toc: false
 ---
 <div class="home-hero">
-  <p class="eyebrow">INVESTIGACIÓN · POBLACIÓN Y FUTURO</p>
-  <h1>Más allá de 2043: escenarios para el futuro demográfico de Colombia
-</h1>
-  <p class="home-deck">Colombia 2018–2070 · Proyección del DANE: incertidumbre y sensibilidad</p>
-  <p class="home-intro">El DANE proyecta el máximo poblacional hacia 2043. Su magnitud y fecha dependen de los supuestos de fecundidad, mortalidad y migración.</p>
+  <p class="eyebrow">ESTADÍSTICA · DEMOGRAFÍA DE COLOMBIA</p>
+  <h1>Del dato a la decisión: un explorador estadístico de la demografía colombiana</h1>
+  <p class="home-deck">Colombia 2018–2070 · Proyección del DANE: escenarios, incertidumbre y sensibilidad</p>
+  <p class="home-intro">Según el DANE, la población de Colombia llegará a su máximo en 2043 y después empezará a bajar. Pero esa fecha depende de cuántos hijos tengan las mujeres, de cuánto vivamos y de cuánta gente llegue o salga del país. Este tablero facilita la información para explorar qué tan probable es que se cumpla y qué pasaría si los supuestos cambian.</p>
 </div>
 
 ```js
@@ -53,18 +52,19 @@ const formatoMillones = new Intl.NumberFormat("es-CO", {minimumFractionDigits: 2
 <section class="editorial-section" aria-labelledby="trayectoria-dane">
   <p class="section-kicker">TRAYECTORIA DEMOGRÁFICA</p>
   <h2 id="trayectoria-dane">La proyección oficial alcanza su máximo en ${registroPico.anio}</h2>
-  <p>La curva muestra la proyección de población total del DANE. La línea vertical marca 2043 y el punto, el máximo de la serie.</p>
+  <p>Proyección oficial del DANE: la población crece hasta el máximo y luego disminuye. La línea vertical marca 2043 y el punto, el máximo de la serie.</p>
 
 ```js
   Plot.plot({
     width,
     height: 390,
-    marginLeft: 76,
+    marginLeft: width < 600 ? 50 : 76,
     marginBottom: 48,
-    x: {label: "Año", ticks: 8, tickFormat: d => String(Math.round(d))},
+    x: {label: "Año", ticks: width < 600 ? 4 : 8, tickFormat: d => String(Math.round(d))},
     y: {label: "Población (millones de habitantes)", grid: true, tickFormat: d => d.toLocaleString("es-CO", {maximumFractionDigits: 0})},
     marks: [
       Plot.ruleX([2043], {stroke: "#C8795B", strokeDasharray: "4,4", strokeWidth: 1.5}),
+      Plot.text([{anio: 2043, poblacion_millones: Math.min(...serieOverview.map(d => d.poblacion_millones)) + 0.35}], {x: "anio", y: "poblacion_millones", text: () => "2043", dx: 6, textAnchor: "start", fill: "#8A4A32", fontSize: 12, fontWeight: 600}),
       Plot.line(serieOverview, {x: "anio", y: "poblacion_millones", stroke: "var(--series-dane)", strokeWidth: 2.5}),
       Plot.dot([registroPico], {x: "anio", y: "poblacion_millones", r: 5, fill: "var(--series-dane)", stroke: "white", strokeWidth: 1.5}),
       Plot.dot(serieOverview, Plot.pointerX({
@@ -88,8 +88,8 @@ const formatoMillones = new Intl.NumberFormat("es-CO", {minimumFractionDigits: 2
 <section class="editorial-section" aria-labelledby="lectura-maximo-poblacional">
   <p class="section-kicker">POR QUÉ IMPORTA</p>
   <h2 id="lectura-maximo-poblacional">Un año de referencia, no una certeza</h2>
-  <p>2043 es una estimación condicionada por supuestos demográficos, no una fecha cierta. Los análisis siguientes cuantifican cómo cambia la trayectoria al modificar esos supuestos.</p>
-  <aside class="method-note"><strong>Nota metodológica:</strong> en 2043, el DANE proyecta <strong>56,05 millones</strong> y el proyector calibrado del equipo, <strong>56,30 millones</strong>. Son series distintas; los escenarios del equipo se comparan con su propia referencia calibrada.</aside>
+  <p>2043 es una estimación condicionada a supuestos, no una fecha cierta. Las secciones siguientes la contrastan con los nacimientos registrados, escenarios alternativos, simulaciones y un análisis de sensibilidad.</p>
+  <aside class="method-note"><strong>Nota metodológica:</strong> en 2043 el DANE proyecta <strong>56,05 millones</strong> y el modelo propio del equipo (calibrado con el DANE), <strong>56,30 millones</strong> (+0,45 %). Los escenarios se comparan con ese modelo, no con la cifra oficial.</aside>
 </section>
 
 <section class="editorial-section section-links" aria-labelledby="explorar-secciones">
@@ -98,8 +98,8 @@ const formatoMillones = new Intl.NumberFormat("es-CO", {minimumFractionDigits: 2
   <div class="section-grid">
     <a class="section-card" href="./fecundidad"><span class="card-index">01 / FECUNDIDAD</span><h3>¿Se cumple lo proyectado?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
     <a class="section-card" href="./escenarios"><span class="card-index">02 / ESCENARIOS</span><h3>¿Y si la fecundidad no se recupera?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
-    <a class="section-card" href="./incertidumbre"><span class="card-index">03 / INCERTIDUMBRE</span><h3>¿Qué tan firme es el 2043?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
+    <a class="section-card" href="./incertidumbre"><span class="card-index">03 / INCERTIDUMBRE</span><h3>¿Qué tan probable es el 2043?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
     <a class="section-card" href="./sensibilidad"><span class="card-index">04 / SENSIBILIDAD</span><h3>¿Qué componente desplaza más el máximo poblacional?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
-    <a class="section-card section-card-territory" href="./explorador-geografico"><span class="card-index">05 / TERRITORIO</span><h3>¿Dónde cambian los nacimientos?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
+    <a class="section-card section-card-territory" href="./explorador-geografico"><span class="card-index">05 / TERRITORIO</span><h3>¿Dónde llega antes el máximo poblacional?</h3><span class="card-arrow" aria-hidden="true">↗</span></a>
   </div>
 </section>

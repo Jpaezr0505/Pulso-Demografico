@@ -1,63 +1,80 @@
-# Demografía de Colombia · 2018–2070
+# Pulso Demográfico · Demografía de Colombia 2018–2070
 
-**Escenarios, incertidumbre y sensibilidad de la proyección poblacional.** Proyecto académico que contrasta la proyección del DANE con estimaciones de fecundidad calculadas a partir de Estadísticas Vitales (EEVV), y explora cómo cambian los resultados al variar los supuestos demográficos.
+**Del dato a la decisión: un explorador estadístico de la demografía colombiana.**
+Proyecto de Estadística (curso de Demografía) que contrasta la proyección de población del DANE con la fecundidad calculada desde las Estadísticas Vitales (EEVV) y mide qué tan probable es que el máximo poblacional de **2043** se cumpla.
+
+**Autores:** Juan David Jerónimo González · Juan Esteban Páez Ruiz
+
+🌐 **Tablero en línea:** _(pegar aquí el enlace de Netlify)_
 
 > El análisis propio complementa —no reemplaza— la proyección oficial. Las probabilidades de Monte Carlo son condicionales a los supuestos del modelo; la fecundidad EEVV es una estimación indirecta.
+
+## Pregunta y hallazgos
+
+El DANE proyecta que Colombia alcanza su máximo en **2043** (56.048.194 personas), suponiendo 1,65 hijos por mujer en 2025. Con los nacimientos registrados (EEVV) la fecundidad calculada es ≈ **1,03**. Con esa brecha, el repositorio responde: ¿qué tan firme es el 2043?
+
+El tablero tiene cinco secciones: **Fecundidad** (DANE vs. EEVV), **Escenarios** (DANE, EEVV congelada, recuperación parcial), **Incertidumbre** (Monte Carlo de 100.000 trayectorias), **Sensibilidad** (qué componente mueve más el máximo) y **Territorio** (año del máximo por departamento y región).
+
+## Reproducir el análisis
+
+**Requisitos:** R (versión reciente) con los paquetes `tidyverse`, `readxl` y `sf`; Node.js ≥ 18 y npm. Todos los insumos están en el repositorio (`datos_crudos/`), no hay que descargar nada.
+
+```r
+# En R/RStudio, desde la raíz del repositorio
+install.packages(c("tidyverse", "readxl", "sf"))
+source("reproducir.R")   # main.R -> modelo.R -> departamentos.R -> mapa.R
+```
+
+```sh
+# Tablero (Observable Framework)
+cd dashboard_observable
+npm ci
+npm run dev      # vista local en http://localhost:3000
+npm run build    # compilación de producción en dist/
+```
+
+- `modelo.R` fija `set.seed(2043)`: los resultados del Monte Carlo son idénticos en cada ejecución.
+- `main.R` termina con una lista de controles de calidad (`resultados/controles.csv`); deben pasar todos.
+- El tablero **no calcula nada**: solo lee los CSV y GeoJSON generados por R.
+- En cada `push`, GitHub Actions compila el tablero para comprobar que sigue funcionando.
+
+## Flujo de datos
+
+```
+datos_crudos/ (Excel DANE, EEVV, geojson)
+   │  main.R
+   ▼
+datos_limpios/ ──► modelo.R ──► resultados/ (escenarios, Monte Carlo, sensibilidad)
+   │                 departamentos.R ──► resultados/ + mapa.R ──► datos_limpios/*.geojson
+   ▼
+dashboard_observable/  (loaders en src/data/ leen resultados/ y datos_limpios/)  ──►  sitio web
+```
 
 ## Estructura
 
 | Ruta | Contenido |
 |---|---|
+| `reproducir.R` | Ejecuta todo el análisis en orden |
 | `main.R` | Limpieza y validación de datos DANE y EEVV |
 | `modelo.R` | Proyector por cohortes, escenarios, Monte Carlo y sensibilidad |
+| `departamentos.R` | Métricas por departamento (pico, TGF, nacimientos) y picos regionales |
 | `mapa.R` | Procesamiento territorial y generación de GeoJSON |
-| `datos_crudos/` | Insumos originales; el shapefile del MGN se obtiene por separado |
-| `datos_limpios/` | Datos procesados para el modelo y el dashboard |
-| `resultados/` | Resultados tabulares generados por los scripts R |
-| `dashboard_observable/` | Sitio web Observable Framework |
-| `PROJECT_CONTEXT.md` | Contexto técnico ampliado para continuar el proyecto |
-| `FICHA_TECNICA.md` | Descripción metodológica y fuentes del estudio |
+| `datos_crudos/` | Insumos originales sin modificar (DANE, EEVV, MGN 2018, geoBoundaries) |
+| `datos_limpios/` | Datos procesados para el modelo y el tablero |
+| `resultados/` | Tablas generadas por los scripts R |
+| `dashboard_observable/` | Sitio web (Observable Framework) |
+| `FICHA_TECNICA.md` | Metodología, supuestos y fuentes |
+| `PROJECT_CONTEXT.md` | Contexto técnico ampliado |
+| `netlify.toml` | Configuración de publicación en Netlify |
 
-## Requisitos
+## Limitaciones
 
-- R y los paquetes `tidyverse`, `readxl` y `sf` (este último para mapas).
-- Node.js 18 o posterior y npm.
+- La fecundidad EEVV es calculada, no observada: incluye nacimientos de madres residentes en el exterior y usa población proyectada como denominador.
+- Los rangos del Monte Carlo y de la sensibilidad son supuestos del equipo, no probabilidades oficiales.
+- En 8 de las 22 regiones el máximo cae después de 2050, el último año de la proyección regional del DANE.
 
-## Ejecución
+## Fuentes y licencia
 
-Desde la raíz del repositorio, en R/RStudio:
+DANE (proyecciones de población 2018–2070, fecundidad, mortalidad, migración, Marco Geoestadístico Nacional), Estadísticas Vitales (nacimientos 2018–2025) y geoBoundaries (San Andrés, CC BY 4.0). Detalles y atribución en `FICHA_TECNICA.md`.
 
-```r
-source("main.R")
-source("modelo.R")
-# Opcional, al contar con los insumos cartográficos:
-source("mapa.R")
-```
-
-Para levantar y compilar el dashboard, desde `dashboard_observable/`:
-
-```sh
-npm ci
-npm run dev
-# Validación de producción
-npm run build
-```
-
-La vista local se sirve normalmente en `http://localhost:3000`. Los CSV del dashboard se leen desde `resultados/` y `datos_limpios/` en la raíz; los loaders están en `dashboard_observable/src/data/`.
-
-## Relevo territorial
-
-La carpeta `datos_crudos/mapa/` no contiene actualmente el MGN. Para generar el mapa departamental:
-
-1. Descargar del Geoportal del DANE el Marco Geoestadístico Nacional (MGN), nivel **Departamento**, incluidos los componentes del shapefile (`.shp`, `.shx`, `.dbf`, `.prj`), y guardarlos en `datos_crudos/mapa/`.
-2. Confirmar que `main.R` ya generó `datos_limpios/eevv_departamental.csv`.
-3. Ejecutar `source("mapa.R")`. Se esperan `datos_limpios/mapa_departamentos.geojson` y `resultados/mapa_metricas_departamento.csv`.
-4. Revisar la página `dashboard_observable/src/explorador-geografico.md` y sus loaders asociados; compilar el dashboard.
-
-La agregación opcional a las 22 regiones requiere además el shapefile municipal y `datos_crudos/mapa/municipio_region.csv` con columnas `cod_mpio` (código de cinco dígitos) y `region`. Sin esa correspondencia municipal no se deben inferir ni dibujar regiones.
-
-## Fuentes y uso
-
-Fuentes principales: DANE (proyecciones de población, fecundidad, mortalidad, migración y Marco Geoestadístico Nacional) y Estadísticas Vitales (nacimientos). Consultar `FICHA_TECNICA.md` y los metadatos de cada fuente para detalles y atribución. Los insumos del DANE incluidos en el repositorio se mantienen para reproducibilidad y colaboración; verificar sus condiciones de uso antes de redistribuir públicamente el proyecto.
-
-No se incorpora una licencia de software por ahora: confirmar derechos y condiciones de redistribución de los componentes y datos antes de asignar una.
+Los datos son de sus entidades de origen y se incluyen para reproducibilidad; verificar sus condiciones de uso antes de redistribuir. El código del proyecto aún no tiene licencia asignada.

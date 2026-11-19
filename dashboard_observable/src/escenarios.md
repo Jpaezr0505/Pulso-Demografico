@@ -47,18 +47,18 @@ const maximoTardio = Math.max(...resumenEscenarios.map(d => d.anio_pico));
 <section class="editorial-section" aria-labelledby="comparacion-escenarios">
   <p class="section-kicker">TRAYECTORIAS DE POBLACIÓN</p>
   <h2 id="comparacion-escenarios">Los supuestos producen máximos poblacionales distintos</h2>
-  <p>Las curvas corresponden al proyector calibrado del equipo, no a la serie oficial del DANE. La línea vertical marca 2043.</p>
+  <p>Las curvas corresponden al modelo propio del equipo (calibrado con el DANE), no a la serie oficial del DANE. La línea vertical marca 2043. Desde 2026, «DANE» usa los supuestos de fecundidad del DANE, «EEVV congelada» mantiene la fecundidad en el nivel de los nacimientos registrados en 2025 y «recuperación parcial» la sube gradualmente hasta 1,5 hijos por mujer en 2050.</p>
 </section>
 
 ```js
 Plot.plot({
   width,
   height: 410,
-  marginLeft: 78,
+  marginLeft: width < 600 ? 50 : 78,
   marginBottom: 48,
   color: {domain: escenariosOrden, range: paletaEscenarios, legend: true},
-  x: {label: "Año", ticks: 8, tickFormat: d => String(Math.round(d))},
-  y: {label: "Población (Millones)", grid: true, tickFormat: d => d.toLocaleString("es-CO", {maximumFractionDigits: 0})},
+  x: {label: "Año", ticks: width < 600 ? 4 : 8, tickFormat: d => String(Math.round(d))},
+  y: {label: "Población (millones de habitantes)", grid: true, tickFormat: d => d.toLocaleString("es-CO", {maximumFractionDigits: 0})},
   marks: [
     Plot.ruleX([2043], {stroke: "#A8B2BE", strokeDasharray: "4,4", strokeWidth: 1.5}),
     Plot.line(escenariosSerie, {x: "anio", y: "poblacion_millones", stroke: "escenario", z: "escenario", strokeWidth: 2.5, tip: true}),
@@ -67,7 +67,7 @@ Plot.plot({
       y: "poblacion_millones",
       fill: "escenario",
       r: 4,
-      title: d => `${d.anio} · ${d.escenario}\n${formatoPoblacion.format(d.poblacion_millones)}`
+      title: d => `${d.anio} · ${d.escenario}\n${formatoPoblacion.format(d.poblacion_millones)} millones`
     }))
   ]
 })
@@ -78,11 +78,11 @@ Plot.plot({
 <section class="editorial-section" aria-labelledby="resumen-escenarios">
   <p class="section-kicker">AÑO DEL MÁXIMO POBLACIONAL Y NIVELES DE POBLACIÓN</p>
   <h2 id="resumen-escenarios">La comparación para cada escenario</h2>
-  <p>Los valores provienen del resumen precalculado y se expresan en millones de habitantes.</p>
+  <p>Valores en millones de habitantes.</p>
 </section>
 
 ```js
-const formatoAnio = valor => new Intl.NumberFormat("es-CO", {maximumFractionDigits: 0}).format(valor);
+const formatoAnio = valor => String(Math.round(valor));
 display(html`<div class="section-grid" style="grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));">
   ${resumenEscenarios.map(d => html`<article class="section-card">
     <span class="card-index">${d.escenario}</span>
@@ -97,6 +97,6 @@ display(html`<div class="section-grid" style="grid-template-columns: repeat(auto
 <section class="editorial-section" aria-labelledby="lectura-escenarios">
   <p class="section-kicker">LECTURA DEMOGRÁFICA</p>
   <h2 id="lectura-escenarios">El momento del máximo poblacional depende de los supuestos</h2>
-  <p>El máximo se alcanza entre ${maximoTemprano} y ${maximoTardio}. En 2043, la brecha entre ${menor2043.escenario} y ${mayor2043.escenario} es ${enMillones(brecha2043)} millones de habitantes.</p>
-  <aside class="method-note"><strong>Referencia:</strong> en 2043, el proyector del equipo estima <strong>56,30 millones</strong> y el DANE <strong>56,05 millones</strong>. Las comparaciones de escenarios usan únicamente el proyector del equipo.</aside>
+  <p>El máximo se alcanza entre ${maximoTemprano} y ${maximoTardio}. En 2043, la brecha entre ${menor2043.escenario} y ${mayor2043.escenario} es de ${enMillones(brecha2043)} millones de habitantes. Con recuperación parcial el máximo sigue en 2043, pero con menos población que en el escenario DANE; con fecundidad congelada llega antes.</p>
+  <aside class="method-note"><strong>Referencia:</strong> en 2043 el modelo del equipo estima <strong>56,30 millones</strong> y el DANE <strong>56,05 millones</strong>. Los escenarios se comparan solo con ese modelo.</aside>
 </section>

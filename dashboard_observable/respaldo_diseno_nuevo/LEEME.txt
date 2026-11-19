@@ -1,0 +1,2 @@
+Diseño nuevo (barra superior, portada con abanico, tarjetas). Guardado 17-nov-2026.
+Para volver: copiar src/* y observablehq.config.js de esta carpeta sobre dashboard_observable/.

@@ -1,0 +1,20 @@
+# Comprueba en cada push que el tablero compila con los datos del repositorio.
+name: Compilar tablero
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: dashboard_observable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: dashboard_observable/package-lock.json
+      - run: npm ci
+      - run: npm run build
+        env:
+          OBSERVABLE_TELEMETRY_DISABLE: "true"

@@ -1,4 +1,4 @@
-# PROJECT_CONTEXT — Demografía de Colombia
+# PROJECT_CONTEXT — Pulso Demográfico (Demografía de Colombia)
 
 ## Propósito
 
@@ -12,7 +12,8 @@ Los resultados propios complementan la proyección del DANE; no son una proyecci
 
 - `main.R`: importa, limpia y valida las bases de entrada; genera CSV limpios y algunos resultados comparativos.
 - `modelo.R`: proyecta la población por cohortes, calibra el proyector, calcula escenarios, Monte Carlo y sensibilidad.
-- `mapa.R`: prepara datos geográficos del proyecto.
+- `departamentos.R`: métricas por departamento y picos regionales (usa DANE por departamento y EEVV).
+- `mapa.R`: prepara los GeoJSON del mapa (departamentos y San Andrés ampliado).
 - `datos_crudos/dane/`, `datos_crudos/eevv/`, `datos_crudos/mapa/`: fuentes originales. No sobrescribirlas al modificar el dashboard.
 - `datos_limpios/`: bases procesadas que usa el modelo.
 - `resultados/`: CSV generados por los scripts R y consumidos por el dashboard.
@@ -24,11 +25,11 @@ Los resultados propios complementan la proyección del DANE; no son una proyecci
 
 ## Flujo de datos y ejecución
 
-Trabajar desde la carpeta raíz del proyecto (`proyecto_demografia`). Para reconstruir los resultados desde las fuentes:
+Trabajar desde la carpeta raíz del proyecto (`demografia-colombia`). Para reconstruir los resultados desde las fuentes:
 
 1. Abrir esta carpeta en RStudio y ejecutar `source("main.R")`.
 2. Ejecutar `source("modelo.R")` después de `main.R`.
-3. Si se modificó la entrada geográfica, ejecutar `source("mapa.R")` cuando estén disponibles sus insumos.
+3. Ejecutar `source("departamentos.R")` y luego `source("mapa.R")` para actualizar la página Territorio.
 4. Para el dashboard, abrir una terminal en `dashboard_observable/` y ejecutar `npm run dev`; normalmente queda disponible en `http://localhost:3000`.
 5. Validar la compilación estática con `npm run build` desde `dashboard_observable/` (genera `dist/`).
 

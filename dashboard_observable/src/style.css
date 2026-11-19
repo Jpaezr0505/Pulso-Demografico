@@ -15,7 +15,7 @@
   /* Textos */
   --color-secondary: #878787;
   --color-ink-secondary: #666666;
-  --color-ink-muted: #878787;
+  --color-ink-muted: #6B6F6F;
 
   /* Identidad cromática Vichy */
   --color-petroleum: #05AD98;
@@ -39,8 +39,8 @@
   --font-editorial: Georgia, "Times New Roman", serif;
 
   /* Dimensiones */
-  --measure-reading: 68ch;
-  --measure-page: 1120px;
+  --measure-reading: none;
+  --measure-page: 1240px;
 
   /* Espaciado */
   --space-1: 0.5rem;
@@ -95,25 +95,132 @@ body {
    ========================================= */
 
 #observablehq-sidebar {
+  --theme-background-alt: #F5F6F6;
+  --theme-foreground: #333333;
+  --theme-foreground-muted: #666666;
+  --theme-foreground-faintest: #D9DCDC;
+  --theme-foreground-focus: #05AD98;   /* barra del enlace activo */
   background: var(--color-surface);
   border-right: 1px solid var(--color-border);
+  font-size: 15px;
 }
 
+/* Título del sitio */
+#observablehq-sidebar > ol:first-child {
+  font-family: var(--font-editorial);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #036357;
+}
+
+#observablehq-sidebar > ol:first-child::before {
+  background: var(--color-surface);
+}
+
+#observablehq-sidebar > ol:first-child > li > a {
+  color: #036357;
+}
+
+/* Separadores entre grupos */
+#observablehq-sidebar > ol,
+#observablehq-sidebar > details,
+#observablehq-sidebar > section {
+  border-bottom: 1px solid #D9DCDC;
+}
+
+/* Rótulos de grupo (Análisis, Territorio) */
+#observablehq-sidebar summary {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6B7373;
+  padding-top: 0.9rem;
+  padding-bottom: 0.4rem;
+}
+
+/* Enlaces: cada uno es una "píldora" redondeada dentro del menú */
 #observablehq-sidebar a {
-  color: var(--color-ink-secondary);
-  border-radius: var(--radius-small);
+  color: var(--color-ink);
   transition: color 140ms ease, background-color 140ms ease;
 }
 
-#observablehq-sidebar a:hover,
-#observablehq-sidebar .observablehq-link-active > a {
-  color: #047F70;
-  background: #E5F5F2;
+#observablehq-sidebar .observablehq-link a {
+  margin-left: 0;
+  padding: 0.6rem 1rem 0.6rem 1.1rem;
+  border-radius: 8px;
 }
 
+#observablehq-sidebar .observablehq-link {
+  margin: 2px 0;
+}
+
+#observablehq-sidebar .observablehq-link a:hover {
+  color: #036357;
+  background: #EAF6F4;
+}
+
+/* Página activa: fondo suave + marca vertical redondeada dentro de la píldora */
 #observablehq-sidebar .observablehq-link-active > a {
+  color: #036357;
+  background: #E1F3F0;
   font-weight: 650;
 }
+
+#observablehq-sidebar .observablehq-link-active::before {
+  top: 24%;
+  bottom: 24%;
+  left: 0.35rem;
+  width: 3px;
+  border-radius: 3px;
+  background: #05AD98;
+  z-index: 1;
+}
+
+#observablehq-sidebar summary {
+  margin-left: 0;
+  padding-left: 1.1rem;
+}
+
+/* Pulido final del menú */
+#observablehq-sidebar a,
+#observablehq-sidebar a:hover,
+#observablehq-sidebar a:focus-visible {
+  text-decoration: none;
+}
+
+/* El título deja espacio al botón de cerrar */
+#observablehq-sidebar > ol:first-child > li > a {
+  font-size: 18px;
+  line-height: 1.2;
+  padding-right: 2.6rem;
+  border-radius: 0;
+  background: none;
+}
+
+#observablehq-sidebar > ol:first-child > li > a:hover {
+  background: none;
+  color: #036357;
+}
+
+#observablehq-sidebar li.observablehq-link:not(.observablehq-link-active) > a:hover {
+  color: #036357;
+  background: #EAF6F4;
+}
+
+#observablehq-sidebar details summary:hover {
+  background: transparent;
+}
+
+#observablehq-sidebar-close {
+  color: #6B7373;
+}
+#observablehq-sidebar-close:hover {
+  color: #036357;
+}
+
 
 /* =========================================
    CONTENIDO PRINCIPAL
@@ -130,7 +237,7 @@ body {
 #observablehq-main h2,
 #observablehq-main h3 {
   color: var(--color-ink);
-  text-wrap: balance;
+  text-wrap: wrap;
 }
 
 #observablehq-main h1,
@@ -142,13 +249,13 @@ body {
 }
 
 #observablehq-main h1 {
-  max-width: 18ch;
+  max-width: none;
   margin-block: 0.4rem 1.25rem;
   font-size: clamp(2.4rem, 6.2vw, 4.8rem);
 }
 
 #observablehq-main h2 {
-  max-width: 26ch;
+  max-width: none;
   margin-block: 0.4rem 1rem;
   font-size: clamp(1.75rem, 3.4vw, 2.6rem);
 }
@@ -164,7 +271,7 @@ body {
 }
 
 #observablehq-main a {
-  color: #047F70;
+  color: #036357;
   text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
 }
@@ -189,16 +296,16 @@ body {
 }
 
 .home-hero h1 {
-  max-width: 16ch !important;
+  max-width: none !important;
   margin-top: var(--space-2) !important;
-  font-size: clamp(2.7rem, 7.5vw, 6rem) !important;
+  font-size: clamp(2.3rem, 5.6vw, 4.5rem) !important;
 }
 
 .eyebrow,
 .section-kicker,
 .page-kicker,
 .card-index {
-  color: #047F70 !important;
+  color: #036357 !important;
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -215,7 +322,7 @@ body {
 }
 
 .home-hero .home-intro {
-  max-width: 58ch;
+  max-width: none;
   margin-top: 1.1rem;
   font-size: clamp(1.05rem, 1.8vw, 1.2rem);
   line-height: 1.7;
@@ -289,11 +396,11 @@ body {
 }
 
 .section-card .card-index {
-  color: #878787 !important;
+  color: var(--color-ink-muted) !important;
 }
 
 .section-card h3 {
-  max-width: 26ch;
+  max-width: none;
   margin: 0 2rem 0 0;
   font-family: var(--font-editorial);
   font-size: clamp(1.15rem, 2vw, 1.4rem) !important;
@@ -305,7 +412,7 @@ body {
   position: absolute;
   right: 1.4rem;
   bottom: 1.25rem;
-  color: #05AD98;
+  color: #036357;
   font-size: 1.1rem;
 }
 
@@ -440,3 +547,147 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* =========================================
+   BARRA SUPERIOR (reemplaza el menú lateral)
+   ========================================= */
+
+body { max-width: none; margin: 0; }
+
+#observablehq-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  display: block;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border-bottom: 1px solid #E3E6E6;
+  background: rgb(255 255 255 / 94%);
+  backdrop-filter: saturate(1.4) blur(10px);
+}
+
+#observablehq-header ~ #observablehq-main { margin-top: 0; }
+
+.topbar {
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  max-width: var(--measure-page);
+  margin: 0 auto;
+  padding: 0.75rem clamp(1.25rem, 5vw, 4rem);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: #333333 !important;
+  font-family: var(--font-editorial);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none !important;
+}
+
+.brand-mark { flex: none; width: 34px; height: 34px; }
+
+.topnav {
+  display: flex;
+  gap: 0.25rem;
+  font-size: 0.94rem;
+  font-weight: 500;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topnav::-webkit-scrollbar { display: none; }
+
+.topnav a {
+  flex: none;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  color: #444444 !important;
+  text-decoration: none !important;
+  white-space: nowrap;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.topnav a:hover { background: #F1F3F3; color: #036357 !important; }
+
+.topnav a[aria-current="page"] {
+  background: #DDEFEB;
+  color: #0B6258 !important;
+  font-weight: 650;
+}
+
+#observablehq-footer {
+  max-width: var(--measure-page);
+  margin: 2rem auto 0;
+  padding-inline: clamp(1.25rem, 5vw, 4rem);
+}
+
+/* ===== MAPA (Territorio) ===== */
+.geo-controls { display: flex; flex-wrap: wrap; gap: 1rem 2rem; align-items: center; margin: 1.5rem 0 1rem; }
+.geo-panel .geo-label { flex-wrap: wrap; }
+.geo-panel select.geo-control { max-width: 100%; min-width: 0; flex: 1; }
+.geo-label { display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--color-ink-secondary); }
+.geo-label-off { opacity: 0.4; pointer-events: none; }
+.geo-control { font: inherit; font-size: 0.9rem; color: var(--color-ink); }
+select.geo-control { padding: 0.4rem 0.6rem; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; }
+input.geo-control { accent-color: var(--color-petroleum); }
+.geo-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 2rem; align-items: start; }
+.geo-map { min-width: 0; position: relative; }
+.geo-inset { position: absolute; left: 0; bottom: 0; display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.4rem; border: 1px solid var(--color-border); border-radius: 6px; background: #fff; }
+.geo-inset span { font-size: 0.7rem; color: var(--color-ink-secondary); }
+.geo-panel { min-width: 0; border: 1px solid var(--color-border); border-radius: 8px; padding: 1.1rem 1.2rem; background: #fff; }
+.geo-kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem 1rem; margin: 1rem 0 1.2rem; }
+.geo-kpis dt { font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-ink-muted); }
+.geo-kpis dd { margin: 0.15rem 0 0; font-size: 1.05rem; font-weight: 600; color: var(--color-ink); }
+.geo-kpis small { font-weight: 400; color: var(--color-ink-secondary); }
+.geo-chart-title { margin: 0.8rem 0 0.2rem; font-size: 0.85rem; font-weight: 600; color: var(--color-ink-secondary); }
+@media (max-width: 860px) { .geo-layout { grid-template-columns: 1fr; } }
+@media (max-width: 860px) {
+  .geo-controls { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+  .geo-controls .geo-label { flex-wrap: wrap; }
+  .geo-controls select.geo-control, .geo-controls input.geo-control { max-width: 100%; flex: 1 1 100%; }
+}
+
+.geo-inset-islas { display: flex; gap: 0.4rem; }
+.geo-isla { margin: 0; text-align: center; }
+.geo-isla figcaption { font-size: 0.7rem; color: var(--color-ink-muted); }
+.geo-isla svg { max-width: 100%; }
+
+/* Texto a todo el ancho de la columna (el tema base limita párrafos, títulos y figuras a 640 px) */
+#observablehq-main :is(p, h3, h4, ul, ol, table, figure, figcaption) { max-width: none; }
+
+/* Auditoría: texto de gráficos legible (Plot usa 10px por defecto) */
+#observablehq-main svg[class*="plot-"] { font-size: 12px; }
+#observablehq-main [class*="-swatches"] { font-size: 12px; }
+
+/* Auditoría Territorio */
+/* Menú: en pantallas angostas se acomoda en varias filas (antes quedaban enlaces ocultos a la derecha) */
+@media (max-width: 760px) {
+  .topbar { flex-wrap: wrap; row-gap: 0.4rem; }
+  .topnav { flex-wrap: wrap; overflow: visible; row-gap: 0.15rem; }
+  .topnav a { padding: 0.5rem 0.75rem; }
+}
+/* Control de año: área táctil de al menos 24 px (WCAG 2.5.8) */
+.geo-controls input[type="range"] { height: 24px; cursor: pointer; }
+/* En pantallas angostas el recuadro de las islas va debajo del mapa para no tapar departamentos */
+@media (max-width: 980px) {
+  .geo-inset { position: static; margin-top: 0.75rem; width: fit-content; }
+}
+
+/* Leyenda del mapa: que la primera etiqueta (p. ej. −50) no se corte en el borde */
+.geo-map svg { overflow: visible; }
+/* Foco visible y consistente en los controles del mapa */
+.geo-control:focus-visible,
+.geo-isla [role="button"]:focus-visible { outline: 3px solid #036357; outline-offset: 2px; border-radius: 4px; }

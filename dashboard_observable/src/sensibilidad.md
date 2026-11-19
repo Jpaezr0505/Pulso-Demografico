@@ -7,7 +7,7 @@ toc: false
 
 ## ¿Qué componente desplaza más el máximo poblacional?
 
-Se varía un parámetro por vez y se mide su efecto sobre el año y la magnitud del máximo poblacional. Los ensayos son valores precalculados respecto al escenario de referencia.
+Se cambia un componente a la vez y se mide el efecto sobre el año y el tamaño del máximo. Referencia: fecundidad con recuperación parcial; mortalidad y migración del DANE. Valores ensayados: fecundidad 1,0 y 1,8; riesgo de morir −10 % y +10 %; migración nula y doble.
 
 ```js
 import * as Plot from "npm:@observablehq/plot";
@@ -21,6 +21,7 @@ const sensibilidadFuente = await FileAttachment("data/sensibilidad_pico.csv").cs
 const aNumero = valor => valor == null || valor === "" ? NaN : Number(valor);
 const sensibilidad = sensibilidadFuente.map(d => ({
   ...d,
+  componente: String(d.componente).replace("TGF largo plazo", "TGF de largo plazo"),
   valor: aNumero(d.valor),
   anio_pico: aNumero(d.anio_pico),
   pob_pico: aNumero(d.pob_pico),
@@ -46,13 +47,13 @@ const resumenSensibilidad = componentes.map(componente => {
 });
 const dominante = resumenSensibilidad.reduce((a, d) => d.desplazamiento_abs > a.desplazamiento_abs ? d : a, resumenSensibilidad[0]);
 const formatoNumero = new Intl.NumberFormat("es-CO", {maximumFractionDigits: 1});
-const formatoDesplazamiento = valor => `${valor > 0 ? "+" : ""}${formatoNumero.format(valor)}`;
+const formatoDesplazamiento = valor => `${valor > 0 ? "+" : ""}${formatoNumero.format(valor)}`.replace("-", "−");
 const formatoMillones = new Intl.NumberFormat("es-CO", {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const enMillones = valor => formatoMillones.format(valor / 1e6);
 const sensibilidadOrdenada = sensibilidad.map(d => ({
   ...d,
   componenteCorto: d.componente.split(" (")[0],
-  ensayo: `${d.componente.split(" (")[0]} · ${formatoNumero.format(d.valor)}`,
+  ensayo: d.componente.startsWith("Fecundidad") ? `Fecundidad: TGF ${formatoNumero.format(d.valor)}` : d.componente.startsWith("Mortalidad") ? `Mortalidad: riesgo ×${formatoNumero.format(d.valor)}` : `Migración: saldo ×${formatoNumero.format(d.valor)}`,
   direccion: d.cambio_pob_pico_pct < 0 ? "Disminución" : "Aumento"
 })).sort((a, b) => componentes.indexOf(a.componente) - componentes.indexOf(b.componente) || a.valor - b.valor);
 const maxAbsDesplazamiento = Math.max(1, ...sensibilidad.map(d => Math.abs(d.desplaza_anios)));
@@ -63,14 +64,14 @@ const maxAbsCambioPoblacion = Math.max(0.1, ...sensibilidad.map(d => Math.abs(d.
   <p class="section-kicker">MAYOR DESPLAZAMIENTO EN LOS ENSAYOS</p>
   <div class="section-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
     <article class="section-card"><span class="card-index">COMPONENTE CON MAYOR ALCANCE</span><h3>${dominante.componente}</h3><span>Desplazamiento máximo: ${formatoNumero.format(dominante.desplazamiento_abs)} años</span></article>
-    <article class="section-card"><span class="card-index">ADELANTO O RETRASO DEL MÁXIMO</span><h3>${formatoDesplazamiento(dominante.desplazamiento_min)} a ${formatoDesplazamiento(dominante.desplazamiento_max)} años</h3><span>Respecto al escenario base al variar ${dominante.componente}. Negativo = adelanto; positivo = retraso.</span></article>
+    <article class="section-card"><span class="card-index">ADELANTO O RETRASO DEL MÁXIMO</span><h3>${formatoDesplazamiento(dominante.desplazamiento_min)} a ${formatoDesplazamiento(dominante.desplazamiento_max)} años</h3><span>Respecto al escenario base al variar ${dominante.componente.charAt(0).toLowerCase() + dominante.componente.slice(1)}. Negativo = adelanto; positivo = retraso.</span></article>
   </div>
 </div>
 
 <section class="editorial-section" aria-labelledby="desplazamiento-maximo-poblacional">
   <p class="section-kicker">DESPLAZAMIENTO TEMPORAL</p>
   <h2 id="desplazamiento-maximo-poblacional">Efecto de cada parámetro sobre el año máximo</h2>
-  <p>Los puntos muestran los valores ensayados; los segmentos conectan los dos ensayos de cada componente. Cero indica que el año coincide con la referencia.</p>
+  <p>Cada punto es un valor ensayado y el segmento une los dos de cada componente. Cero es el año de referencia. Pasa el cursor para ver el detalle.</p>
 </section>
 
 ```js
@@ -79,7 +80,7 @@ Plot.plot({
   height: 310,
   marginLeft: width < 600 ? 110 : 150,
   marginBottom: 48,
-  x: {label: width < 600 ? "Años" : "Desplazamiento (años)", domain: [-maxAbsDesplazamiento - 1, maxAbsDesplazamiento + 1], grid: true},
+  x: {label: width < 600 ? "Años" : "Desplazamiento (años)", domain: [-maxAbsDesplazamiento - 1, maxAbsDesplazamiento + 1], grid: true, ticks: width < 600 ? 5 : 9, tickFormat: d => String(d).replace("-", "−")},
   y: {
     label: null,
     domain: [0, componentes.length - 1],
@@ -97,14 +98,27 @@ Plot.plot({
     }),
     Plot.dot(sensibilidad, {
       x: "desplaza_anios",
-      y: posicionComponente,
+      y: d => posicionComponente(d.componente),
       fill: "#176B73",
       r: 8,
       stroke: "white",
+      strokeWidth: 2
+    }),
+    Plot.dot(sensibilidad, Plot.pointer({
+      x: "desplaza_anios",
+      y: d => posicionComponente(d.componente),
+      r: 11,
+      fill: "#C8795B",
+      stroke: "white",
       strokeWidth: 2,
-      tip: true,
-      title: d => `${d.componente}\nValor ensayado: ${formatoNumero.format(d.valor)}\nDesplazamiento: ${formatoDesplazamiento(d.desplaza_anios)} años\nAño máximo: ${d.anio_pico}`
-    })
+      maxRadius: 40
+    })),
+    Plot.tip(sensibilidad, Plot.pointer({
+      x: "desplaza_anios",
+      y: d => posicionComponente(d.componente),
+      maxRadius: 40,
+      title: d => `${d.componente}\nValor ensayado: ${formatoNumero.format(d.valor)}\nDesplazamiento: ${formatoDesplazamiento(d.desplaza_anios)} años\nAño máximo: ${d.anio_pico}\nCambio en la población máxima: ${formatoNumero.format(d.cambio_pob_pico_pct)} %`
+    }))
   ]
 })
 ```
@@ -119,10 +133,10 @@ Plot.plot({
 Plot.plot({
   width,
   height: 370,
-  marginLeft: width < 600 ? 120 : 180,
+  marginLeft: width < 600 ? 150 : 200,
   marginBottom: 52,
   color: {domain: ["Disminución", "Aumento"], range: ["#176B73", "#C8795B"], legend: true},
-  x: {label: width < 600 ? "Cambio (%)" : "Cambio poblacional (%)", domain: [-maxAbsCambioPoblacion * 1.2, maxAbsCambioPoblacion * 1.2], grid: true},
+  x: {label: width < 600 ? "Cambio (%)" : "Cambio poblacional (%)", domain: [-maxAbsCambioPoblacion * 1.2, maxAbsCambioPoblacion * 1.2], grid: true, tickFormat: d => d.toLocaleString("es-CO", {minimumFractionDigits: 1, maximumFractionDigits: 1}).replace("-", "−")},
   y: {label: null, domain: sensibilidadOrdenada.map(d => d.ensayo)},
   marks: [
     Plot.ruleX([0], {stroke: "#A8B2BE", strokeWidth: 1}),
@@ -140,6 +154,7 @@ Plot.plot({
 <section class="editorial-section" aria-labelledby="lectura-sensibilidad">
   <p class="section-kicker">INTERPRETACIÓN</p>
   <h2 id="lectura-sensibilidad">Mayor sensibilidad observada: ${dominante.componente}</h2>
-  <p>En los niveles evaluados, este componente desplaza el año máximo entre ${dominante.desplazamiento_min} y ${dominante.desplazamiento_max} años. El resultado describe los ensayos, no una probabilidad.</p>
-  <aside class="method-note"><strong>Alcance:</strong> se varía un componente por vez respecto al escenario base calibrado. No se evalúan interacciones ni todas las combinaciones posibles; las diferencias no se comparan con la proyección oficial del DANE.</aside>
+  <p>Este componente mueve el máximo entre ${formatoDesplazamiento(dominante.desplazamiento_min)} y ${formatoDesplazamiento(dominante.desplazamiento_max)} años respecto a la referencia (negativo: antes; positivo: después). Es el efecto de esos valores, no una probabilidad.</p>
+  <aside class="method-note"><strong>Cómo leerlo:</strong> los rangos son elección del equipo; la fecundidad domina en parte por tener el rango más amplio.</aside>
+  <aside class="method-note"><strong>Alcance:</strong> un componente por vez; no se evalúan interacciones ni se compara con el DANE.</aside>
 </section>
